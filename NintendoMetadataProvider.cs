@@ -4,17 +4,18 @@ using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text.RegularExpressions;
 
-namespace Nintendata
+namespace NintendoMetadata
 {
-    public class NintendataProvider : OnDemandMetadataProvider
+    public class NintendoMetadataProvider : OnDemandMetadataProvider
     {
         private readonly MetadataRequestOptions options;
-        private readonly Nintendata plugin;
+        private readonly NintendoMetadata plugin;
         private readonly IPlayniteAPI playniteApi;
 
-        private NintendoEshopClient client;
+        private NintendoClient client;
         private NintendoGame game;
         private static readonly ILogger logger = LogManager.GetLogger();
         private List<MetadataField> availableFields;
@@ -31,12 +32,12 @@ namespace Nintendata
             }
         }
 
-        public NintendataProvider(MetadataRequestOptions options, Nintendata plugin)
+        public NintendoMetadataProvider(MetadataRequestOptions options, NintendoMetadata plugin)
         {
             this.options = options;
             this.plugin = plugin;
             this.playniteApi = plugin.PlayniteApi;
-            this.client = new NintendoEshopClient(options);
+            this.client = new NintendoClient(options, ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings);
         }
 
         private List<MetadataField> GetAvailableFields()
@@ -85,12 +86,21 @@ namespace Nintendata
                 fields.Add(MetadataField.Links);
             }
 
-            if (game.Image != null && !string.IsNullOrEmpty(game.Image.Path))
+            if (game.Image?.HasImageData == true)
             {
                 fields.Add(MetadataField.CoverImage);
             }
 
-            if (game.AgeRatings.Count > 0)
+            if (game.LandscapeImage?.HasImageData == true)
+            {
+                fields.Add(MetadataField.BackgroundImage);
+            }
+
+            var ageRatingOrgPriority = playniteApi.ApplicationSettings.AgeRatingOrgPriority;
+            var storeRegion = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings.StoreRegion;
+            if (game.AgeRatings.Count > 0 &&
+                (ageRatingOrgPriority == AgeRatingOrg.ESRB && storeRegion == StoreRegion.US)
+                || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.UK))
             {
                 fields.Add(MetadataField.AgeRating);
             }
@@ -159,9 +169,11 @@ namespace Nintendata
             }
 
         }
-        private string NormalizeSearchString(string search)
+        internal static string NormalizeSearchString(string search)
         {
-            return new Regex(@"\[.*\]").Replace(search, "").Replace("-", " ").Replace(":", "").ToLower();
+            search = new Regex(@"\[.*\]").Replace(search, "");
+            search = new Regex(@"\(.*\)").Replace(search, "");
+            return search.Replace("-", " ").Replace(":", "").ToLower();
         }
 
         private string[] SplitStringToWords(string normalizedString)
@@ -263,6 +275,15 @@ namespace Nintendata
             if (AvailableFields.Contains(MetadataField.CoverImage))
             {
                 return this.game.Image;
+            }
+            return base.GetCoverImage(args);
+        }
+
+        public override MetadataFile GetBackgroundImage(GetMetadataFieldArgs args)
+        {
+            if (AvailableFields.Contains(MetadataField.BackgroundImage))
+            {
+                return this.game.LandscapeImage;
             }
             return base.GetCoverImage(args);
         }
