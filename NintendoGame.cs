@@ -55,7 +55,7 @@ namespace NintendoMetadata
 
             var developer = (string)data["softwareDeveloper"];
 
-            if (!string.IsNullOrEmpty(developer))
+            if (!string.IsNullOrEmpty(developer?.Trim()))
             {
                 var developers = developer.Split(',').Select(i => i.Trim());
                 foreach(var d in developers)
