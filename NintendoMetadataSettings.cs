@@ -84,9 +84,9 @@ namespace NintendoMetadata
 
     public enum StoreRegion
     {
-        [Description("North America")]
+        [Description("US")]
         US,
-        [Description("Europe")]
+        [Description("UK")]
         UK,
         [Description("Japan")]
         Japan,
