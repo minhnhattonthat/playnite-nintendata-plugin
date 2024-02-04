@@ -57,7 +57,11 @@ namespace NintendoMetadata
 
             if (!string.IsNullOrEmpty(developer))
             {
-                result.Developers.Add(new MetadataNameProperty(developer));
+                var developers = developer.Split(',').Select(i => i.Trim());
+                foreach(var d in developers)
+                {
+                    result.Developers.Add(new MetadataNameProperty(d));
+                }
             }
 
             result.Publishers.Add(new MetadataNameProperty((string)data["softwarePublisher"]));
