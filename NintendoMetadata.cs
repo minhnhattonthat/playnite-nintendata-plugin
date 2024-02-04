@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace Nintendata
+namespace NintendoMetadata
 {
-    public class Nintendata : MetadataPlugin
+    public class NintendoMetadata : MetadataPlugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private NintendataSettingsViewModel settings { get; set; }
+        private NintendoMetadataSettingsViewModel settings { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("5213fe24-bc90-4578-ae00-0039fac67ed8");
 
@@ -26,18 +26,19 @@ namespace Nintendata
             MetadataField.AgeRating,
             MetadataField.Links,
             MetadataField.CoverImage,
+            MetadataField.BackgroundImage,
         };
 
-        public override string Name => "Nintendata";
+        public override string Name => "Nintendo";
 
-        public Nintendata(IPlayniteAPI api) : base(api)
+        public NintendoMetadata(IPlayniteAPI api) : base(api)
         {
-            settings = new NintendataSettingsViewModel(this);
+            settings = new NintendoMetadataSettingsViewModel(this);
         }
 
         public override OnDemandMetadataProvider GetMetadataProvider(MetadataRequestOptions options)
         {
-            return new NintendataProvider(options, this);
+            return new NintendoMetadataProvider(options, this);
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
@@ -47,7 +48,7 @@ namespace Nintendata
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
-            return new NintendataSettingsView();
+            return new NintendoMetadataSettingsView();
         }
     }
 }

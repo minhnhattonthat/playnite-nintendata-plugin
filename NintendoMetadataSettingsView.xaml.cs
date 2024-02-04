@@ -13,11 +13,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Nintendata
+namespace NintendoMetadata
 {
-    public partial class NintendataSettingsView : UserControl
+    public partial class NintendoMetadataSettingsView : UserControl
     {
-        public NintendataSettingsView()
+        public NintendoMetadataSettingsView()
         {
             InitializeComponent();
         }

@@ -1,7 +1,10 @@
-﻿Id: Nintendata_5213fe24-bc90-4578-ae00-0039fac67ed8
-Name: Nintendata
+﻿Id: NintendoMetadata
+Name: Nintendo Metadata
 Author: Nathan Ton
-Version: 0.1.0
-Module: Nintendata.dll
+Version: 0.2.0
+Module: NintendoMetadata.dll
 Type: MetadataProvider
 Icon: icon.png
+Links:
+    - Name: GitHub
+      Url: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin
