@@ -1,4 +1,4 @@
-AddonId: NintendoMetada
+AddonId: NintendoMetadata
 Packages:
   - Version: 0.2.0
     RequiredApiVersion: 6.8.0
