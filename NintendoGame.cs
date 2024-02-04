@@ -78,10 +78,10 @@ namespace NintendoMetadata
 
             result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.com{(string)data["url"]}"));
 
-            var imageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1.5/c_scale,w_700/{(string)data["productImage"]}";
+            var imageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1/c_scale,w_800/{(string)data["productImage"]}";
             result.Image = new MetadataFile(imageUrl);
 
-            var landscapeImageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1.5/c_scale,w_1920/{(string)data["productImage"]}";
+            var landscapeImageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1/c_scale,w_1920/{(string)data["productImage"]}";
             result.LandscapeImage = new MetadataFile(landscapeImageUrl);
 
             result.Name = result.Title;
