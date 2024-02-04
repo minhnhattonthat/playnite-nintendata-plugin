@@ -173,7 +173,6 @@ namespace NintendoMetadata
             { "格闘", "Fighting" },
             { "音楽", "Music" },
             { "パーティー", "Party" },
-            { "実用", "Practice" },
             { "パズル", "Puzzle" },
             { "レース", "Race" },
             { "ロールプレイング", "Role-playing (RPG)"},
@@ -184,7 +183,8 @@ namespace NintendoMetadata
             { "学習", "Study" },
             { "テーブル", "Table" },
             { "トレーニング", "Training" },
-            { "その他", "Others" },
+            { "実用", "Utility" },
+            { "その他", "Other" },
         };
     }
 }
