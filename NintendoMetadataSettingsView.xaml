@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="NintendoMetadata.NintendoMetadataSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:nintendata="clr-namespace:NintendoMetadata"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <UserControl.Resources>
+        <nintendata:EnumValueConverter x:Key="EnumValueConverter" />
+    </UserControl.Resources>
+    <StackPanel Margin="20">
+        <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+            <TextBlock Text="Nintendo Store Region" VerticalAlignment="Center"/>
+            <ComboBox SelectedValue="{Binding Settings.StoreRegion}"
+                      Margin="5,0,0,0">
+                <ComboBox.ItemsSource>
+                    <x:Array Type="{x:Type sys:Enum}">
+                        <nintendata:StoreRegion>US</nintendata:StoreRegion>
+                        <nintendata:StoreRegion>UK</nintendata:StoreRegion>
+                        <nintendata:StoreRegion>Japan</nintendata:StoreRegion>
+                    </x:Array>
+                </ComboBox.ItemsSource>
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumValueConverter}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

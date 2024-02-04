@@ -2,33 +2,28 @@
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nintendata
+namespace NintendoMetadata
 {
-    public class NintendataSettings : ObservableObject
+    public class NintendoMetadataSettings : ObservableObject
     {
-        private string option1 = string.Empty;
-        private bool option2 = false;
-        private bool optionThatWontBeSaved = false;
+        private StoreRegion storeRegion = StoreRegion.US;
 
-        public string Option1 { get => option1; set => SetValue(ref option1, value); }
-        public bool Option2 { get => option2; set => SetValue(ref option2, value); }
-        // Playnite serializes settings object to a JSON object and saves it as text file.
-        // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
-        [DontSerialize]
-        public bool OptionThatWontBeSaved { get => optionThatWontBeSaved; set => SetValue(ref optionThatWontBeSaved, value); }
+        public StoreRegion StoreRegion { get => storeRegion; set => SetValue(ref storeRegion, value); }
+
     }
 
-    public class NintendataSettingsViewModel : ObservableObject, ISettings
+    public class NintendoMetadataSettingsViewModel : ObservableObject, ISettings
     {
-        private readonly Nintendata plugin;
-        private NintendataSettings editingClone { get; set; }
+        private readonly NintendoMetadata plugin;
+        private NintendoMetadataSettings editingClone { get; set; }
 
-        private NintendataSettings settings;
-        public NintendataSettings Settings
+        private NintendoMetadataSettings settings;
+        public NintendoMetadataSettings Settings
         {
             get => settings;
             set
@@ -38,13 +33,13 @@ namespace Nintendata
             }
         }
 
-        public NintendataSettingsViewModel(Nintendata plugin)
+        public NintendoMetadataSettingsViewModel(NintendoMetadata plugin)
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
             this.plugin = plugin;
 
             // Load saved settings.
-            var savedSettings = plugin.LoadPluginSettings<NintendataSettings>();
+            var savedSettings = plugin.LoadPluginSettings<NintendoMetadataSettings>();
 
             // LoadPluginSettings returns null if no saved data is available.
             if (savedSettings != null)
@@ -53,7 +48,7 @@ namespace Nintendata
             }
             else
             {
-                Settings = new NintendataSettings();
+                Settings = new NintendoMetadataSettings();
             }
         }
 
@@ -85,5 +80,15 @@ namespace Nintendata
             errors = new List<string>();
             return true;
         }
+    }
+
+    public enum StoreRegion
+    {
+        [Description("North America")]
+        US,
+        [Description("Europe")]
+        UK,
+        [Description("Japan")]
+        Japan,
     }
 }
