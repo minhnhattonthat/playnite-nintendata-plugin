@@ -4,6 +4,7 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NintendoMetadata
 {
@@ -57,7 +58,7 @@ namespace NintendoMetadata
 
             if (!string.IsNullOrEmpty(developer?.Trim()))
             {
-                var developers = developer.Split(',').Select(i => i.Trim());
+                var developers = new Regex(@", ").Split(developer);
                 foreach(var d in developers)
                 {
                     result.Developers.Add(new MetadataNameProperty(d));
