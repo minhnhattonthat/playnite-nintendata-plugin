@@ -140,17 +140,23 @@ namespace NintendoMetadata
                 FullDescription = (string)data["text"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dsdate"]),
             };
-            
+
             result.Publishers.Add(new MetadataNameProperty((string)data["maker"]));
 
-            IList<string> genreList = data["genre"]?.Select(v=> (string)v)?.ToList() ?? new List<string>();
+            IList<string> genreList = data["genre"]?.Select(v => (string)v)?.ToList() ?? new List<string>();
             foreach (string genre in genreList)
             {
                 JapanGenreMap.TryGetValue(genre, out string g);
                 result.Genres.Add(new MetadataNameProperty(g ?? genre));
             }
-            
-            result.Links.Add(new Link("My Nintendo Store", (string)data["url"]));
+
+            if ((string)data["url"] != null)
+            {
+                result.Links.Add(new Link("Nintendo Landing Page", (string)data["url"]));
+            }
+
+            var storeUrl = $"https://store-jp.nintendo.com/list/software/{(string)data["nsuid"]}.html";
+            result.Links.Add(new Link("My Nintendo Store", storeUrl));
 
             // 1920x1080 $"https://img-eshop.cdn.nintendo.net/i/{data["iurl"]}.jpg"
             // sw $"https://store-jp.nintendo.com/dw/image/v2/BFGJ_PRD/on/demandware.static/-/Sites-all-master-catalog/ja_JP/dwe8af036b/products/D{(string)data["nsuid"]}/heroBanner/{(string)data["iurl"]}.jpg?sw=1024&strip=false"
@@ -171,6 +177,7 @@ namespace NintendoMetadata
             { "アクション", "Action" },
             { "アドベンチャー", "Adventure" },
             { "アーケード", "Arcade" },
+            { "コミュニケーション", "Communication" },
             { "格闘", "Fighting" },
             { "音楽", "Music" },
             { "パーティー", "Party" },
