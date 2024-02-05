@@ -4,6 +4,7 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NintendoMetadata
 {
@@ -55,9 +56,20 @@ namespace NintendoMetadata
 
             var developer = (string)data["softwareDeveloper"];
 
-            if (!string.IsNullOrEmpty(developer))
+            if (!string.IsNullOrEmpty(developer?.Trim()))
             {
-                result.Developers.Add(new MetadataNameProperty(developer));
+                if (developer.EndsWith(", LTD."))
+                {
+                    result.Developers.Add(new MetadataNameProperty(developer));
+                }
+                else
+                {
+                    var developers = new Regex(@", ").Split(developer);
+                    foreach (var d in developers)
+                    {
+                        result.Developers.Add(new MetadataNameProperty(d));
+                    }
+                }
             }
 
             result.Publishers.Add(new MetadataNameProperty((string)data["softwarePublisher"]));
@@ -78,10 +90,10 @@ namespace NintendoMetadata
 
             result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.com{(string)data["url"]}"));
 
-            var imageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1.5/c_scale,w_700/{(string)data["productImage"]}";
+            var imageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1/c_scale,w_800/{(string)data["productImage"]}";
             result.Image = new MetadataFile(imageUrl);
 
-            var landscapeImageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1.5/c_scale,w_1920/{(string)data["productImage"]}";
+            var landscapeImageUrl = $"https://assets.nintendo.com/image/upload/ar_16:9,b_auto:border,c_lpad/b_white/f_auto/q_auto/dpr_1/c_scale,w_1920/{(string)data["productImage"]}";
             result.LandscapeImage = new MetadataFile(landscapeImageUrl);
 
             result.Name = result.Title;
@@ -135,17 +147,23 @@ namespace NintendoMetadata
                 FullDescription = (string)data["text"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dsdate"]),
             };
-            
+
             result.Publishers.Add(new MetadataNameProperty((string)data["maker"]));
 
-            IList<string> genreList = data["genre"]?.Select(v=> (string)v)?.ToList() ?? new List<string>();
+            IList<string> genreList = data["genre"]?.Select(v => (string)v)?.ToList() ?? new List<string>();
             foreach (string genre in genreList)
             {
                 JapanGenreMap.TryGetValue(genre, out string g);
                 result.Genres.Add(new MetadataNameProperty(g ?? genre));
             }
-            
-            result.Links.Add(new Link("My Nintendo Store", (string)data["url"]));
+
+            if ((string)data["url"] != null)
+            {
+                result.Links.Add(new Link("Nintendo Landing Page", (string)data["url"]));
+            }
+
+            var storeUrl = $"https://store-jp.nintendo.com/list/software/{(string)data["nsuid"]}.html";
+            result.Links.Add(new Link("My Nintendo Store", storeUrl));
 
             // 1920x1080 $"https://img-eshop.cdn.nintendo.net/i/{data["iurl"]}.jpg"
             // sw $"https://store-jp.nintendo.com/dw/image/v2/BFGJ_PRD/on/demandware.static/-/Sites-all-master-catalog/ja_JP/dwe8af036b/products/D{(string)data["nsuid"]}/heroBanner/{(string)data["iurl"]}.jpg?sw=1024&strip=false"
@@ -166,10 +184,10 @@ namespace NintendoMetadata
             { "アクション", "Action" },
             { "アドベンチャー", "Adventure" },
             { "アーケード", "Arcade" },
+            { "コミュニケーション", "Communication" },
             { "格闘", "Fighting" },
             { "音楽", "Music" },
             { "パーティー", "Party" },
-            { "実用", "Practice" },
             { "パズル", "Puzzle" },
             { "レース", "Race" },
             { "ロールプレイング", "Role-playing (RPG)"},
@@ -180,7 +198,8 @@ namespace NintendoMetadata
             { "学習", "Study" },
             { "テーブル", "Table" },
             { "トレーニング", "Training" },
-            { "その他", "Others" },
+            { "実用", "Utility" },
+            { "その他", "Other" },
         };
     }
 }
