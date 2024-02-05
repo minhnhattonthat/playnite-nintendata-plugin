@@ -58,10 +58,17 @@ namespace NintendoMetadata
 
             if (!string.IsNullOrEmpty(developer?.Trim()))
             {
-                var developers = new Regex(@", ").Split(developer);
-                foreach(var d in developers)
+                if (developer.EndsWith(", LTD."))
                 {
-                    result.Developers.Add(new MetadataNameProperty(d));
+                    result.Developers.Add(new MetadataNameProperty(developer));
+                }
+                else
+                {
+                    var developers = new Regex(@", ").Split(developer);
+                    foreach (var d in developers)
+                    {
+                        result.Developers.Add(new MetadataNameProperty(d));
+                    }
                 }
             }
 
