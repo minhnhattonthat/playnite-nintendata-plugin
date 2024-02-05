@@ -6,3 +6,9 @@ Packages:
     PackageUrl: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin/releases/download/v0.2.0/NintendoMetadata_0_2_0.pext
     Changelog:
       - Initial release
+  - Version: 0.2.1
+    RequiredApiVersion: 6.8.0
+    ReleaseDate: 2024-02-05
+    PackageUrl: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin/releases/download/v0.2.1/NintendoMetadata_0_2_1.pext
+    Changelog:
+      - Fix bugs and improve stability
