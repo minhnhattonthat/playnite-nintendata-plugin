@@ -11,7 +11,7 @@ Playnite metadata extension for retrieving data from Nintendo stores. Currently 
 
 - [ ] Use LibHac to extract name to query with Nintendo API
 - [ ] Option for image size
-- [ ] Suppport for more europe locales
+- [ ] Suppport for more regions
 - [ ] Add CI/CD
 - [ ] Refactor
 
