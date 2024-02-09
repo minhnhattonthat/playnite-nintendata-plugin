@@ -12,3 +12,12 @@ Packages:
     PackageUrl: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin/releases/download/v0.2.1/NintendoMetadata_0_2_1.pext
     Changelog:
       - General system stability improvements to enhance the user's experience.
+  - Version: 0.3.0
+    RequiredApiVersion: 6.8.0
+    ReleaseDate: 2024-02-09
+    PackageUrl: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin/releases/download/v0.3.0/NintendoMetadata_0_3_0.pext
+    Changelog:
+      - Added Asia (Singapore) store support.
+      - Added fetching game description from game details page.
+      - General system stability improvements to enhance the user's experience.
+      - Happy Lunar New Year!
