@@ -11,7 +11,7 @@ namespace NintendoMetadata
 {
     public class NintendoMetadataSettings : ObservableObject
     {
-        private StoreRegion storeRegion = StoreRegion.US;
+        private StoreRegion storeRegion = StoreRegion.USA;
 
         public StoreRegion StoreRegion { get => storeRegion; set => SetValue(ref storeRegion, value); }
 
@@ -84,11 +84,13 @@ namespace NintendoMetadata
 
     public enum StoreRegion
     {
-        [Description("US")]
-        US,
+        [Description("USA")]
+        USA,
         [Description("UK")]
         UK,
         [Description("Japan")]
         Japan,
+        [Description("Asia")]
+        Asia,
     }
 }
