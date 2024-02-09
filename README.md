@@ -3,9 +3,10 @@
 ## About
 
 Playnite metadata extension for retrieving data from Nintendo stores. Currently supports
-- [US store](https://www.nintendo.com/us/)
+- [USA store](https://www.nintendo.com/us/)
 - [UK store](https://www.nintendo.co.uk/)
 - [Japan store](https://www.nintendo.co.jp)
+- [Asia (Singapore) store](http://www.nintendo.com/sg)
 
 ## TODO
 
