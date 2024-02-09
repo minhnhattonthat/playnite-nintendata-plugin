@@ -33,6 +33,8 @@ namespace NintendoMetadata
 
         public MetadataFile LandscapeImage { get; set; }
 
+        public string NSUID { get; set; }
+
         public Game LibraryGame;
 
         public NintendoGame()
@@ -52,6 +54,7 @@ namespace NintendoMetadata
                 Title = ((string)data["title"]).Replace("™", ""),
                 FullDescription = (string)data["description"],
                 ReleaseDate = new ReleaseDate((DateTime)data["releaseDate"]),
+                NSUID = (string)data["nsuid"],
             };
 
             var developer = (string)data["softwareDeveloper"];
@@ -109,6 +112,7 @@ namespace NintendoMetadata
                 Title = (string)data["title"],
                 FullDescription = (string)data["product_catalog_description_s"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dates_released_dts"][0]),
+                NSUID = (string)data["nsuid_txt"][0],
             };
             
             var developer = (string)data["softwareDeveloper"];
@@ -146,6 +150,7 @@ namespace NintendoMetadata
                 Title = (string)data["title"],
                 FullDescription = (string)data["text"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dsdate"]),
+                NSUID = (string)data["nsuid"],
             };
 
             result.Publishers.Add(new MetadataNameProperty((string)data["maker"]));
@@ -176,6 +181,56 @@ namespace NintendoMetadata
             result.Name = result.Title;
             result.Description = $"{result.ReleaseDate?.Year}-{result.ReleaseDate?.Month}-{result.ReleaseDate?.Day} | {result.Publishers.First()}";
             
+            return result;
+        }
+
+        public static NintendoGame ParseAsiaGame(JObject data)
+        {
+            var result = new NintendoGame()
+            {
+                Title = (string)data["common"]["title"],
+                ReleaseDate = new ReleaseDate((DateTime)data["releaseDate"]),
+                NSUID = (string)data["common"]["nsuid"],
+            };
+
+            string developer = (string)data["common"]["developerName"];
+            if (!string.IsNullOrEmpty(developer))
+            {
+                result.Developers.Add(new MetadataNameProperty(developer));
+            }
+
+            result.Publishers.Add(new MetadataNameProperty((string)data["common"]["publisherName"]));
+
+            result.AgeRatings.Add(new MetadataNameProperty($"ESRB {(string)data["common"]["esrb"]}"));
+
+            if ((string)data["softPageUrl"] != null)
+            {
+                var storeUrl = $"https://www.nintendo.com/sg{(string)data["softPageUrl"]}";
+                result.Links.Add(new Link("My Nintendo Store", storeUrl));
+            }
+            else
+            {
+                var storeUrl = $"https://www.nintendo.com/sg/games/switch/detail/{(string)data["common"]["nsuid"]}";
+                result.Links.Add(new Link("My Nintendo Store", storeUrl));
+            }
+
+            if (data["common"]["heroImageSquare"].HasValues)
+            {
+                var imageUrl = (string)data["common"]["heroImageSquare"]["url"];
+                result.Image = new MetadataFile(imageUrl);
+            }
+
+            var landscapeImageUrl = (string)data["common"]["heroImage169"]["url"];
+            result.LandscapeImage = new MetadataFile(landscapeImageUrl);
+
+            if (result.Image == null)
+            {
+                result.Image = result.LandscapeImage;
+            }
+
+            result.Name = result.Title;
+            result.Description = $"{result.ReleaseDate?.Year}-{result.ReleaseDate?.Month}-{result.ReleaseDate?.Day} | {result.Publishers.First()}";
+
             return result;
         }
 
