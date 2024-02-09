@@ -16,7 +16,7 @@ namespace NintendoMetadata
         private readonly NintendoMetadata plugin;
         private readonly IPlayniteAPI playniteApi;
 
-        private NintendoClient client;
+        private INintendoClient client;
         private NintendoGame game;
         private static readonly ILogger logger = LogManager.GetLogger();
         private List<MetadataField> availableFields;
