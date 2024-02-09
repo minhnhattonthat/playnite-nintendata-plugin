@@ -11,4 +11,4 @@ Packages:
     ReleaseDate: 2024-02-05
     PackageUrl: https://github.com/minhnhattonthat/playnite-nintendo-metadata-plugin/releases/download/v0.2.1/NintendoMetadata_0_2_1.pext
     Changelog:
-      - Fix bugs and improve stability
+      - General system stability improvements to enhance the user's experience.

@@ -17,9 +17,10 @@
                       Margin="5,0,0,0">
                 <ComboBox.ItemsSource>
                     <x:Array Type="{x:Type sys:Enum}">
-                        <nintendata:StoreRegion>US</nintendata:StoreRegion>
+                        <nintendata:StoreRegion>USA</nintendata:StoreRegion>
                         <nintendata:StoreRegion>UK</nintendata:StoreRegion>
                         <nintendata:StoreRegion>Japan</nintendata:StoreRegion>
+                        <nintendata:StoreRegion>Asia</nintendata:StoreRegion>
                     </x:Array>
                 </ComboBox.ItemsSource>
                 <ComboBox.ItemTemplate>
