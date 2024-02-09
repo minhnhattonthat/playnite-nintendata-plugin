@@ -1,3 +1,4 @@
+﻿using NintendoMetadata.Client;
 ﻿using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
@@ -99,7 +100,7 @@ namespace NintendoMetadata
             var ageRatingOrgPriority = playniteApi.ApplicationSettings.AgeRatingOrgPriority;
             var storeRegion = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings.StoreRegion;
             if (game.AgeRatings.Count > 0 &&
-                (ageRatingOrgPriority == AgeRatingOrg.ESRB && storeRegion == StoreRegion.US)
+                (ageRatingOrgPriority == AgeRatingOrg.ESRB && storeRegion == StoreRegion.USA)
                 || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.UK))
             {
                 fields.Add(MetadataField.AgeRating);
@@ -120,12 +121,20 @@ namespace NintendoMetadata
                 logger.Debug("not background");
                 var item = plugin.PlayniteApi.Dialogs.ChooseItemWithSearch(null, (a) =>
                 {
-                    return client.SearchGames(NormalizeSearchString(a));
+                    if (string.IsNullOrWhiteSpace(a))
+                    {
+                        return new List<GenericItemOption>();
+                    }
+                    
+                    // TODO: search by ID
+
+                    return client.SearchGames(NormalizeSearchString(a)).Cast<GenericItemOption>().ToList();
                 }, options.GameData.Name);
 
                 if (item != null)
                 {
-                    this.game = (NintendoGame)item;
+                    var searchItem = item as NintendoGame;
+                    this.game = client.GetGameDetails(searchItem);
                 }
                 else
                 {
@@ -135,28 +144,29 @@ namespace NintendoMetadata
             }
             else
             {
+                NintendoGame gameResult = new NintendoGame();
                 try
                 {
-                    List<GenericItemOption> results = client.SearchGames(NormalizeSearchString(options.GameData.Name));
-
+                    var normalizeSearchString = NormalizeSearchString(options.GameData.Name);
+                    List<GenericItemOption> results = client.SearchGames(normalizeSearchString).Cast<GenericItemOption>().ToList();
                     switch (results.Count)
                     {
                         case 0:
-                            this.game = new NintendoGame();
+                            gameResult = new NintendoGame();
                             break;
                         case 1:
-                            this.game = (NintendoGame)results.First();
+                            gameResult = (NintendoGame)results.First();
                             break;
                         default:
                             var words = SplitStringToWords(NormalizeSearchString(options.GameData.Name));
                             var nameFullyMatchedResult = results.FirstOrDefault(game => words.All(w => game.Name.ToLower().Contains(w)));
                             if (nameFullyMatchedResult != null)
                             {
-                                this.game = (NintendoGame)nameFullyMatchedResult;
+                                gameResult = (NintendoGame)nameFullyMatchedResult;
                             }
                             else
                             {
-                                this.game = new NintendoGame();
+                                gameResult = new NintendoGame();
                             }
                             break;
                     }
@@ -164,11 +174,12 @@ namespace NintendoMetadata
                 catch (Exception e)
                 {
                     logger.Error(e, "Failed to get Nintendo game metadata.");
-                    this.game = new NintendoGame();
+                    gameResult = new NintendoGame();
+                }
+                this.game = client.GetGameDetails(gameResult);
                 }
             }
 
-        }
         internal static string NormalizeSearchString(string search)
         {
             search = new Regex(@"\[.*\]").Replace(search, "");
