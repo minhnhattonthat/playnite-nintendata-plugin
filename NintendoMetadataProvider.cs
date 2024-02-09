@@ -1,5 +1,5 @@
 ﻿using NintendoMetadata.Client;
-﻿using Playnite.SDK;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
@@ -38,7 +38,25 @@ namespace NintendoMetadata
             this.options = options;
             this.plugin = plugin;
             this.playniteApi = plugin.PlayniteApi;
-            this.client = new NintendoClient(options, ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings);
+            var pluginSettings = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings;
+            switch (pluginSettings.StoreRegion)
+            {
+                case StoreRegion.USA:
+                    this.client = new USANintendoClient(options, pluginSettings);
+                    break;
+                case StoreRegion.UK:
+                    this.client = new UKNintendoClient(options, pluginSettings);
+                    break;
+                case StoreRegion.Japan:
+                    this.client = new JapanNintendoClient(options, pluginSettings);
+                    break;
+                case StoreRegion.Asia:
+                    this.client = new AsiaNintendoClient(options, pluginSettings);
+                    break;
+                default:
+                    this.client = new USANintendoClient(options, pluginSettings);
+                    break;
+            }
         }
 
         private List<MetadataField> GetAvailableFields()
@@ -177,8 +195,8 @@ namespace NintendoMetadata
                     gameResult = new NintendoGame();
                 }
                 this.game = client.GetGameDetails(gameResult);
-                }
             }
+        }
 
         internal static string NormalizeSearchString(string search)
         {
