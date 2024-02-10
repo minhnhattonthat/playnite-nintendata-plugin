@@ -146,7 +146,7 @@ namespace NintendoMetadata
                     
                     // TODO: search by ID
 
-                    return client.SearchGames(NormalizeSearchString(a)).Cast<GenericItemOption>().ToList();
+                    return client.SearchGames(a.NormalizeGameName()).Cast<GenericItemOption>().ToList();
                 }, options.GameData.Name);
 
                 if (item != null)
@@ -165,7 +165,7 @@ namespace NintendoMetadata
                 NintendoGame gameResult = new NintendoGame();
                 try
                 {
-                    var normalizeSearchString = NormalizeSearchString(options.GameData.Name);
+                    var normalizeSearchString = options.GameData.Name.NormalizeGameName();
                     List<GenericItemOption> results = client.SearchGames(normalizeSearchString).Cast<GenericItemOption>().ToList();
                     switch (results.Count)
                     {
@@ -176,7 +176,7 @@ namespace NintendoMetadata
                             gameResult = (NintendoGame)results.First();
                             break;
                         default:
-                            var words = SplitStringToWords(NormalizeSearchString(options.GameData.Name));
+                            var words = normalizeSearchString.SplitToWords();
                             var nameFullyMatchedResult = results.FirstOrDefault(game => words.All(w => game.Name.ToLower().Contains(w)));
                             if (nameFullyMatchedResult != null)
                             {
@@ -196,18 +196,6 @@ namespace NintendoMetadata
                 }
                 this.game = client.GetGameDetails(gameResult);
             }
-        }
-
-        internal static string NormalizeSearchString(string search)
-        {
-            search = new Regex(@"\[.*\]").Replace(search, "");
-            search = new Regex(@"\(.*\)").Replace(search, "");
-            return search.Replace("-", " ").Replace(":", "").ToLower();
-        }
-
-        private string[] SplitStringToWords(string normalizedString)
-        {
-            return new Regex(@"\W").Split(normalizedString);
         }
 
         public override string GetName(GetMetadataFieldArgs args)

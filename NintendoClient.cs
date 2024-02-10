@@ -4,6 +4,9 @@ using Playnite.SDK.Plugins;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NintendoMetadata
 {
@@ -120,6 +123,48 @@ namespace NintendoMetadata
             }
 
             return d[d.GetUpperBound(0), d.GetUpperBound(1)];
+        }
+    }
+
+    public static class NintendoClientExtensions
+    {
+        public static string[] SplitToWords(this string input)
+        {
+            return new Regex(@"(?!\\.)\W").Split(input);
+        }
+
+        public static string NormalizeGameName(this string input)
+        {
+            // to lower case
+            string output = input.ToLower();
+
+            // remove all accents
+            var bytes = Encoding.GetEncoding("Cyrillic").GetBytes(output);
+            output = Encoding.ASCII.GetString(bytes);
+            
+            // remove invalid chars           
+            output = Regex.Replace(output, @"[^a-z0-9\s-]", "");
+
+            // convert multiple spaces into one space   
+            output = Regex.Replace(output, @"\s+", " ").Trim();
+            
+            return output;
+        }
+
+        public static List<NintendoGame> OrderByRelevant(this List<NintendoGame> list, string normalizedSearchName)
+        {
+            var words = new Regex(@"(?!\\.)\W").Split(normalizedSearchName);
+            string regex = string.Join("|", words);
+            return list
+                .Select(game => new
+                {
+                    MatchCount = Regex.Matches(game.Name.NormalizeGameName(), regex).Count,
+                    Game = game,
+                })
+                .Where(item => item.MatchCount > 0)
+                .OrderByDescending(item => item.MatchCount)
+                .Select(item => item.Game)
+                .ToList();
         }
     }
 }
