@@ -1,16 +1,11 @@
 ﻿using Playnite.SDK.Plugins;
-using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json.Linq;
 using HtmlAgilityPack;
-using Playnite.SDK.Models;
-using System.Text.RegularExpressions;
-using System.Web.UI.WebControls;
+using Newtonsoft.Json;
 
 namespace NintendoMetadata.Client
 {
@@ -75,7 +70,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            return results.OrderBy(game => NameStringCompare(normalizedSearchName, game.Name)).ToList();
+            return results.OrderByRelevant(normalizedSearchName);
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)

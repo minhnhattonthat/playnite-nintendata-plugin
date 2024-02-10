@@ -50,12 +50,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            var words = new Regex(@"(?!\\.)\W").Split(normalizedSearchName);
-            string regex = string.Join("|", words);
-            return results
-                .Where(game => Regex.IsMatch(game.Name.ToLower(), regex))
-                .OrderByDescending(game => Regex.Matches(game.Name.ToLower(), regex).Count)
-                .ToList();
+            return results.OrderByRelevant(normalizedSearchName);
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)
