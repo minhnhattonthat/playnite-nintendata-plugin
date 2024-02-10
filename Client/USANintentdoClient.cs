@@ -40,7 +40,14 @@ namespace NintendoMetadata.Client
             List<NintendoGame> results = new List<NintendoGame>();
 
             var request = new RestRequest("/", Method.Post);
-            var body = $@"{{""requests"": [{{""indexName"": ""store_game_en_us"",""query"": ""{normalizedSearchName}"",""params"": ""hitsPerPage=10""}}]}}";
+            var requestItem = new
+            {
+                indexName = "store_game_en_us",
+                query = normalizedSearchName,
+                facetFilters = new[] { "corePlatforms:Nintendo Switch", "hasDlc:false" },
+                hitsPerPage = 10,
+            };
+            var body = $@"{{""requests"": [{JsonConvert.SerializeObject(requestItem)}]}}";
             request.RequestFormat = DataFormat.Json;
             request.AddBody(body);
 
