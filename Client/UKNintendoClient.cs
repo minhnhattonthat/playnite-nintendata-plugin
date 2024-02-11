@@ -111,7 +111,7 @@ namespace NintendoMetadata.Client
                 fullDescription = fullDescription.Substring(3, fullDescription.Length - 7);
             }
             game.FullDescription = fullDescription;
-                logger.Info(game.FullDescription);
+            logger.Info(game.FullDescription);
 
             return game;
         }

@@ -61,7 +61,7 @@ namespace NintendoMetadata
 
             if (!string.IsNullOrEmpty(developer?.Trim()))
             {
-                if (developer.EndsWith(", LTD."))
+                if (developer.EndsWith(", LTD.") || developer.EndsWith(", Inc."))
                 {
                     result.Developers.Add(new MetadataNameProperty(developer));
                 }
@@ -132,7 +132,7 @@ namespace NintendoMetadata
             result.AgeRatings.Add(new MetadataNameProperty((string)data["pretty_agerating_s"]));
 
             result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.co.uk{(string)data["url"]}"));
-            
+
             var imageUrl = (string)data["image_url_sq_s"] ?? ((string)data["image_url_tm_s"])?.Replace("300w", "500w") ?? (string)data["image_url"];
             result.Image = new MetadataFile(imageUrl);
             
@@ -194,7 +194,7 @@ namespace NintendoMetadata
                 NSUID = (string)data["common"]["nsuid"],
             };
 
-            string developer = (string)data["common"]["developerName"];
+            string developer = (string)data.SelectToken("common.developerName");
             if (!string.IsNullOrEmpty(developer))
             {
                 result.Developers.Add(new MetadataNameProperty(developer));
@@ -215,14 +215,17 @@ namespace NintendoMetadata
                 result.Links.Add(new Link("My Nintendo Store", storeUrl));
             }
 
-            if (data["common"]["heroImageSquare"].HasValues)
+            var imageUrl = (string)data.SelectToken("common.heroImageSquare.url");
+            if (imageUrl != null)
             {
-                var imageUrl = (string)data["common"]["heroImageSquare"]["url"];
                 result.Image = new MetadataFile(imageUrl);
             }
 
-            var landscapeImageUrl = (string)data["common"]["heroImage169"]["url"];
-            result.LandscapeImage = new MetadataFile(landscapeImageUrl);
+            var landscapeImageUrl = (string)data.SelectToken("common.heroImage169.url");
+            if (landscapeImageUrl != null)
+            {
+                result.LandscapeImage = new MetadataFile(landscapeImageUrl);
+            }
 
             if (result.Image == null)
             {
