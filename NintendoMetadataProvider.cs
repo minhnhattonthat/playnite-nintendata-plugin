@@ -167,26 +167,13 @@ namespace NintendoMetadata
                 {
                     var normalizeSearchString = options.GameData.Name.NormalizeGameName();
                     List<GenericItemOption> results = client.SearchGames(normalizeSearchString).Cast<GenericItemOption>().ToList();
-                    switch (results.Count)
+                    if (results.Count == 0)
                     {
-                        case 0:
                             gameResult = new NintendoGame();
-                            break;
-                        case 1:
-                            gameResult = (NintendoGame)results.First();
-                            break;
-                        default:
-                            var words = normalizeSearchString.SplitToWords();
-                            var nameFullyMatchedResult = results.FirstOrDefault(game => words.All(w => game.Name.ToLower().Contains(w)));
-                            if (nameFullyMatchedResult != null)
-                            {
-                                gameResult = (NintendoGame)nameFullyMatchedResult;
                             }
                             else
                             {
-                                gameResult = new NintendoGame();
-                            }
-                            break;
+                        gameResult = (NintendoGame)results.First();
                     }
                 }
                 catch (Exception e)
