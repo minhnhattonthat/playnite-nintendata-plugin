@@ -24,12 +24,18 @@ namespace NintendoMetadata.Client
         public override List<NintendoGame> SearchGames(string normalizedSearchName)
         {
             List<NintendoGame> results = new List<NintendoGame>();
+            var platform = options.GetPlatform();
+            var playableOnTxt = "HAC";
+            if (platform == NintendoPlatform.Nintendo3DS)
+            {
+                playableOnTxt = "CTR";
+            }
 
             var request = new RestRequest("/");
             var parameters = new
             {
                 q = normalizedSearchName,
-                fq = "type:GAME AND system_type:nintendoswitch*",
+                fq = $@"type:GAME AND playable_on_txt:""{playableOnTxt}""",
                 sort = "score desc, date_from desc",
                 start = 0,
                 rows = 24,

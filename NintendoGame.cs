@@ -112,7 +112,7 @@ namespace NintendoMetadata
                 Title = (string)data["title"],
                 FullDescription = (string)data["product_catalog_description_s"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dates_released_dts"][0]),
-                NSUID = (string)data["nsuid_txt"][0],
+                NSUID = (string)data["nsuid_txt"]?[0],
             };
             
             var developer = (string)data["softwareDeveloper"];
@@ -131,9 +131,10 @@ namespace NintendoMetadata
 
             result.AgeRatings.Add(new MetadataNameProperty((string)data["pretty_agerating_s"]));
 
-            result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.co.uk/{(string)data["url"]}"));
+            result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.co.uk{(string)data["url"]}"));
             
-            result.Image = new MetadataFile((string)data["image_url_sq_s"]);
+            var imageUrl = (string)data["image_url_sq_s"] ?? ((string)data["image_url_tm_s"])?.Replace("300w", "500w") ?? (string)data["image_url"];
+            result.Image = new MetadataFile(imageUrl);
             
             result.LandscapeImage = new MetadataFile(((string)data["image_url_h2x1_s"]).Replace("500w", "1600w"));
 
