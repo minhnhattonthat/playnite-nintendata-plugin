@@ -70,9 +70,67 @@ namespace NintendoMetadata
 
             return JObject.Parse(content);
         }
+    }
+
+    public static class NintendoClientExtensions
+    {
+        public static string[] SplitToWords(this string input)
+        {
+            return new Regex(@"(?!\\.)\W").Split(input);
+        }
+
+        public static string NormalizeGameName(this string input)
+        {
+            // to lower case
+            string output = input.ToLower();
+
+            // remove additional name elements
+            output = new Regex(@"\[.*?\]").Replace(output, "");
+            output = new Regex(@"\(.*?\)").Replace(output, "");
+
+            // remove all accents
+            var bytes = Encoding.GetEncoding("Cyrillic").GetBytes(output);
+            output = Encoding.ASCII.GetString(bytes);
+            
+            // remove invalid chars           
+            output = Regex.Replace(output, @"[^a-z0-9\s-]", "");
+
+            // convert multiple spaces into one space   
+            output = Regex.Replace(output, @"\s+", " ").Trim();
+            
+            return output;
+        }
+
+        public static List<NintendoGame> OrderByRelevance(this List<NintendoGame> list, string normalizedSearchName)
+        {
+            var words = new Regex(@"(?!\\.)\W").Split(normalizedSearchName);
+            string regex = string.Concat(words.Select(w => $@"(?=.*\b{w}\b)"));
+            return list
+                .Where(game => Regex.IsMatch(game.Name.NormalizeGameName(), regex))
+                .OrderBy(game => NameStringCompare(normalizedSearchName, game.Name.NormalizeGameName()))
+                .ToList();
+        }
+
+        public static NintendoPlatform GetPlatform(this MetadataRequestOptions options)
+        {
+            var nintendoPlatform = NintendoPlatform.NintendoSwitch;
+            var platformName = options.GameData.Platforms?[0]?.Name;
+            if (platformName != null)
+            {
+                if (platformName == " Nintendo Switch")
+                {
+                    nintendoPlatform = NintendoPlatform.NintendoSwitch;
+                }
+                else if (platformName == "Nintendo 3DS")
+                {
+                    nintendoPlatform = NintendoPlatform.Nintendo3DS;
+                }
+            }
+            return nintendoPlatform;
+        }
 
         // https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.23
-        protected int NameStringCompare(string a, string b)
+        public static int NameStringCompare(string a, string b)
         {
 
             if (string.IsNullOrEmpty(a))
@@ -123,48 +181,6 @@ namespace NintendoMetadata
             }
 
             return d[d.GetUpperBound(0), d.GetUpperBound(1)];
-        }
-    }
-
-    public static class NintendoClientExtensions
-    {
-        public static string[] SplitToWords(this string input)
-        {
-            return new Regex(@"(?!\\.)\W").Split(input);
-        }
-
-        public static string NormalizeGameName(this string input)
-        {
-            // to lower case
-            string output = input.ToLower();
-
-            // remove all accents
-            var bytes = Encoding.GetEncoding("Cyrillic").GetBytes(output);
-            output = Encoding.ASCII.GetString(bytes);
-            
-            // remove invalid chars           
-            output = Regex.Replace(output, @"[^a-z0-9\s-]", "");
-
-            // convert multiple spaces into one space   
-            output = Regex.Replace(output, @"\s+", " ").Trim();
-            
-            return output;
-        }
-
-        public static List<NintendoGame> OrderByRelevant(this List<NintendoGame> list, string normalizedSearchName)
-        {
-            var words = new Regex(@"(?!\\.)\W").Split(normalizedSearchName);
-            string regex = string.Join("|", words);
-            return list
-                .Select(game => new
-                {
-                    MatchCount = Regex.Matches(game.Name.NormalizeGameName(), regex).Count,
-                    Game = game,
-                })
-                .Where(item => item.MatchCount > 0)
-                .OrderByDescending(item => item.MatchCount)
-                .Select(item => item.Game)
-                .ToList();
         }
     }
 }

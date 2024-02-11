@@ -50,7 +50,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            return results.OrderByRelevant(normalizedSearchName);
+            return results.OrderByRelevance(normalizedSearchName);
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)

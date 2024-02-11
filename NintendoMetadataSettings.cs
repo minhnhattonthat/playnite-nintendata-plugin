@@ -93,4 +93,12 @@ namespace NintendoMetadata
         [Description("Asia")]
         Asia,
     }
+
+    public enum NintendoPlatform
+    {
+        [Description("Nintendo Switch")]
+        NintendoSwitch,
+        [Description("Nintendo 3DS")]
+        Nintendo3DS,
+    }
 }
