@@ -15,6 +15,10 @@ namespace NintendoMetadata
 
         public StoreRegion StoreRegion { get => storeRegion; set => SetValue(ref storeRegion, value); }
 
+        private bool isPlayniteGameRegionPreferred = true;
+
+        public bool IsPlayniteGameRegionPreferred { get => isPlayniteGameRegionPreferred; set => SetValue(ref isPlayniteGameRegionPreferred, value); }
+
     }
 
     public class NintendoMetadataSettingsViewModel : ObservableObject, ISettings

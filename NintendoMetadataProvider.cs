@@ -39,7 +39,24 @@ namespace NintendoMetadata
             this.plugin = plugin;
             this.playniteApi = plugin.PlayniteApi;
             var pluginSettings = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings;
-            switch (pluginSettings.StoreRegion)
+
+            var storeRegion = pluginSettings.StoreRegion;
+
+            var isPlayniteGameRegionPreferred = pluginSettings.IsPlayniteGameRegionPreferred;
+            if (isPlayniteGameRegionPreferred)
+            {
+                var regionName = options.GameData.Regions?[0]?.Name;
+                if (regionName != null)
+                {
+                    var success = Enum.TryParse<StoreRegion>(regionName, out var parsedRegion);
+                    if (success)
+                    {
+                        storeRegion = parsedRegion;
+                    }
+                }
+            }
+
+            switch (storeRegion)
             {
                 case StoreRegion.USA:
                     this.client = new USANintendoClient(options, pluginSettings);
@@ -169,10 +186,10 @@ namespace NintendoMetadata
                     List<GenericItemOption> results = client.SearchGames(normalizeSearchString).Cast<GenericItemOption>().ToList();
                     if (results.Count == 0)
                     {
-                            gameResult = new NintendoGame();
-                            }
-                            else
-                            {
+                        gameResult = new NintendoGame();
+                    }
+                    else
+                    {
                         gameResult = (NintendoGame)results.First();
                     }
                 }

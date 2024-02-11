@@ -30,5 +30,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </StackPanel>
+        <CheckBox Content="Prefer Playnite game region" Margin="0,15,0,0"
+                  IsChecked="{Binding Settings.IsPlayniteGameRegionPreferred}"/>
     </StackPanel>
 </UserControl>
