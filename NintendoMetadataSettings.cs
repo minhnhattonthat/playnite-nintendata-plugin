@@ -86,8 +86,8 @@ namespace NintendoMetadata
     {
         [Description("USA")]
         USA,
-        [Description("UK")]
-        UK,
+        [Description("Europe (UK)")]
+        Europe,
         [Description("Japan")]
         Japan,
         [Description("Asia")]

@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace NintendoMetadata.Client
 {
-    public class UKNintendoClient : NintendoClient
+    public class EuropeNintendoClient : NintendoClient
     {
 
         protected override string BaseUrl => "http://search.nintendo-europe.com/en/select";
 
-        public UKNintendoClient(MetadataRequestOptions options, NintendoMetadataSettings settings) : base(options, settings)
+        public EuropeNintendoClient(MetadataRequestOptions options, NintendoMetadataSettings settings) : base(options, settings)
         {
         }
 
@@ -58,7 +58,7 @@ namespace NintendoMetadata.Client
 
                 foreach (dynamic game in docs)
                 {
-                    NintendoGame g = NintendoGame.ParseUkGame(game);
+                    NintendoGame g = NintendoGame.ParseEuropeGame(game);
                     results.Add(g);
                 }
             }

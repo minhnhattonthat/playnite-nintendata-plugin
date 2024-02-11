@@ -105,7 +105,7 @@ namespace NintendoMetadata
             return result;
         }
 
-        public static NintendoGame ParseUkGame(JObject data)
+        public static NintendoGame ParseEuropeGame(JObject data)
         {
             var result = new NintendoGame
             {

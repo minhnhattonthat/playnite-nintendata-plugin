@@ -44,8 +44,8 @@ namespace NintendoMetadata
                 case StoreRegion.USA:
                     this.client = new USANintendoClient(options, pluginSettings);
                     break;
-                case StoreRegion.UK:
-                    this.client = new UKNintendoClient(options, pluginSettings);
+                case StoreRegion.Europe:
+                    this.client = new EuropeNintendoClient(options, pluginSettings);
                     break;
                 case StoreRegion.Japan:
                     this.client = new JapanNintendoClient(options, pluginSettings);
@@ -119,7 +119,7 @@ namespace NintendoMetadata
             var storeRegion = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings.StoreRegion;
             if (game.AgeRatings.Count > 0 &&
                 (ageRatingOrgPriority == AgeRatingOrg.ESRB && storeRegion == StoreRegion.USA)
-                || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.UK))
+                || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.Europe))
             {
                 fields.Add(MetadataField.AgeRating);
             }
