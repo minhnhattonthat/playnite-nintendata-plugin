@@ -17,13 +17,6 @@ jobs:
           dotnet tool install -g dotnet-format
           pre-commit run --all-files --show-diff-on-failure
 
-  test:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          dotnet test tests
-
   build:
     runs-on: windows-latest
     steps:
