@@ -84,12 +84,34 @@ namespace NintendoMetadata.Client
                 OverrideEncoding = Encoding.UTF8
             };
             var doc = web.Load(link.Url);
-            var descriptionNode = doc.DocumentNode.SelectSingleNode(@"//section[@id='Overview']");
-            if (descriptionNode != null)
+            var fullDescription = "";
+            var descriptionNodes = doc.DocumentNode.SelectNodes(@"//section[@id='Overview']//div[contains(@class, 'row-content')]/div");
+            foreach (var descriptionNode in descriptionNodes)
             {
-                game.FullDescription = Regex.Replace(descriptionNode.InnerHtml, @"\s{2,}", "");
-                logger.Info(game.FullDescription);
+                var header = descriptionNode.SelectSingleNode(@".//h2");
+                if (header != null) 
+                {
+                    var text = new Regex(@" class=""(.*?)""").Replace(header.OuterHtml, "");
+                    fullDescription += text;
+                    continue; 
+                }
+                var paragraphs = descriptionNode.SelectNodes(@".//p");
+                if (paragraphs != null)
+                {
+                    foreach (var paragraph in paragraphs)
+                    {
+                        var text = Regex.Replace(paragraph.OuterHtml, @"\s{2,}", "");
+                        text = new Regex(@" class=""(.*?)""").Replace(text, "");
+                        fullDescription += text;
+                    }
+                }
             }
+            if (fullDescription.StartsWith(@"<p>"))
+            {
+                fullDescription = fullDescription.Substring(3, fullDescription.Length - 7);
+            }
+            game.FullDescription = fullDescription;
+                logger.Info(game.FullDescription);
 
             return game;
         }
