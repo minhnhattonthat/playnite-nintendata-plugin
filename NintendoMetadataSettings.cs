@@ -15,6 +15,10 @@ namespace NintendoMetadata
 
         public StoreRegion StoreRegion { get => storeRegion; set => SetValue(ref storeRegion, value); }
 
+        private bool isPlayniteGameRegionPreferred = true;
+
+        public bool IsPlayniteGameRegionPreferred { get => isPlayniteGameRegionPreferred; set => SetValue(ref isPlayniteGameRegionPreferred, value); }
+
     }
 
     public class NintendoMetadataSettingsViewModel : ObservableObject, ISettings
@@ -86,11 +90,23 @@ namespace NintendoMetadata
     {
         [Description("USA")]
         USA,
-        [Description("UK")]
-        UK,
+        [Description("Europe (UK)")]
+        Europe,
         [Description("Japan")]
         Japan,
         [Description("Asia")]
         Asia,
+    }
+
+    public enum NintendoPlatform
+    {
+        [Description("Nintendo Switch")]
+        NintendoSwitch,
+        [Description("Nintendo 3DS")]
+        Nintendo3DS,
+        [Description("Nintendo Wii")]
+        NintendoWii,
+        [Description("Nintendo Wii U")]
+        NintendoWiiU,
     }
 }

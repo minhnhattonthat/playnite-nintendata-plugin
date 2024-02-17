@@ -61,7 +61,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            return results.OrderBy(game => NameStringCompare(normalizedSearchName, game.Name)).ToList();
+            return results;
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)

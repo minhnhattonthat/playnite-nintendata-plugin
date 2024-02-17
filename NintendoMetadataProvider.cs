@@ -39,13 +39,30 @@ namespace NintendoMetadata
             this.plugin = plugin;
             this.playniteApi = plugin.PlayniteApi;
             var pluginSettings = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings;
-            switch (pluginSettings.StoreRegion)
+
+            var storeRegion = pluginSettings.StoreRegion;
+
+            var isPlayniteGameRegionPreferred = pluginSettings.IsPlayniteGameRegionPreferred;
+            if (isPlayniteGameRegionPreferred)
+            {
+                var regionName = options.GameData.Regions?[0]?.Name;
+                if (regionName != null)
+                {
+                    var success = Enum.TryParse<StoreRegion>(regionName, out var parsedRegion);
+                    if (success)
+                    {
+                        storeRegion = parsedRegion;
+                    }
+                }
+            }
+
+            switch (storeRegion)
             {
                 case StoreRegion.USA:
                     this.client = new USANintendoClient(options, pluginSettings);
                     break;
-                case StoreRegion.UK:
-                    this.client = new UKNintendoClient(options, pluginSettings);
+                case StoreRegion.Europe:
+                    this.client = new EuropeNintendoClient(options, pluginSettings);
                     break;
                 case StoreRegion.Japan:
                     this.client = new JapanNintendoClient(options, pluginSettings);
@@ -119,7 +136,7 @@ namespace NintendoMetadata
             var storeRegion = ((NintendoMetadataSettingsViewModel)plugin.GetSettings(false)).Settings.StoreRegion;
             if (game.AgeRatings.Count > 0 &&
                 (ageRatingOrgPriority == AgeRatingOrg.ESRB && storeRegion == StoreRegion.USA)
-                || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.UK))
+                || (ageRatingOrgPriority == AgeRatingOrg.PEGI && storeRegion == StoreRegion.Europe))
             {
                 fields.Add(MetadataField.AgeRating);
             }
@@ -146,7 +163,7 @@ namespace NintendoMetadata
                     
                     // TODO: search by ID
 
-                    return client.SearchGames(NormalizeSearchString(a)).Cast<GenericItemOption>().ToList();
+                    return client.SearchGames(a.NormalizeGameName()).Cast<GenericItemOption>().ToList();
                 }, options.GameData.Name);
 
                 if (item != null)
@@ -165,28 +182,15 @@ namespace NintendoMetadata
                 NintendoGame gameResult = new NintendoGame();
                 try
                 {
-                    var normalizeSearchString = NormalizeSearchString(options.GameData.Name);
+                    var normalizeSearchString = options.GameData.Name.NormalizeGameName();
                     List<GenericItemOption> results = client.SearchGames(normalizeSearchString).Cast<GenericItemOption>().ToList();
-                    switch (results.Count)
+                    if (results.Count == 0)
                     {
-                        case 0:
-                            gameResult = new NintendoGame();
-                            break;
-                        case 1:
-                            gameResult = (NintendoGame)results.First();
-                            break;
-                        default:
-                            var words = SplitStringToWords(NormalizeSearchString(options.GameData.Name));
-                            var nameFullyMatchedResult = results.FirstOrDefault(game => words.All(w => game.Name.ToLower().Contains(w)));
-                            if (nameFullyMatchedResult != null)
-                            {
-                                gameResult = (NintendoGame)nameFullyMatchedResult;
-                            }
-                            else
-                            {
-                                gameResult = new NintendoGame();
-                            }
-                            break;
+                        gameResult = new NintendoGame();
+                    }
+                    else
+                    {
+                        gameResult = (NintendoGame)results.First();
                     }
                 }
                 catch (Exception e)
@@ -196,18 +200,6 @@ namespace NintendoMetadata
                 }
                 this.game = client.GetGameDetails(gameResult);
             }
-        }
-
-        internal static string NormalizeSearchString(string search)
-        {
-            search = new Regex(@"\[.*\]").Replace(search, "");
-            search = new Regex(@"\(.*\)").Replace(search, "");
-            return search.Replace("-", " ").Replace(":", "").ToLower();
-        }
-
-        private string[] SplitStringToWords(string normalizedString)
-        {
-            return new Regex(@"\W").Split(normalizedString);
         }
 
         public override string GetName(GetMetadataFieldArgs args)

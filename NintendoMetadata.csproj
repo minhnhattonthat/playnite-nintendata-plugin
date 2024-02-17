@@ -88,7 +88,7 @@
   <ItemGroup>
     <Compile Include="Client\AsiaNintendoClient.cs" />
     <Compile Include="Client\JapanNintendoClient.cs" />
-    <Compile Include="Client\UKNintendoClient.cs" />
+    <Compile Include="Client\EuropeNintendoClient.cs" />
     <Compile Include="Client\USANintentdoClient.cs" />
     <Compile Include="NintendoMetadata.cs" />
     <Compile Include="NintendoMetadataProvider.cs" />

@@ -12,24 +12,42 @@ using System.Threading.Tasks;
 
 namespace NintendoMetadata.Client
 {
-    public class UKNintendoClient : NintendoClient
+    public class EuropeNintendoClient : NintendoClient
     {
 
         protected override string BaseUrl => "http://search.nintendo-europe.com/en/select";
 
-        public UKNintendoClient(MetadataRequestOptions options, NintendoMetadataSettings settings) : base(options, settings)
+        public EuropeNintendoClient(MetadataRequestOptions options, NintendoMetadataSettings settings) : base(options, settings)
         {
         }
 
         public override List<NintendoGame> SearchGames(string normalizedSearchName)
         {
             List<NintendoGame> results = new List<NintendoGame>();
+            var platform = options.GetPlatform();
+            string playableOnTxt;
+            switch(platform)
+            {
+                case NintendoPlatform.Nintendo3DS:
+                    playableOnTxt = "CTR";
+                    break;
+                case NintendoPlatform.NintendoWii:
+                    playableOnTxt = "RVL";
+                    break;
+                case NintendoPlatform.NintendoWiiU:
+                    playableOnTxt = "WUP";
+                    break;
+                case NintendoPlatform.NintendoSwitch:
+                default:
+                    playableOnTxt = "HAC";
+                    break;
+            }
 
             var request = new RestRequest("/");
             var parameters = new
             {
                 q = normalizedSearchName,
-                fq = "type:GAME AND system_type:nintendoswitch*",
+                fq = $@"type:GAME AND playable_on_txt:""{playableOnTxt}""",
                 sort = "score desc, date_from desc",
                 start = 0,
                 rows = 24,
@@ -52,7 +70,7 @@ namespace NintendoMetadata.Client
 
                 foreach (dynamic game in docs)
                 {
-                    NintendoGame g = NintendoGame.ParseUkGame(game);
+                    NintendoGame g = NintendoGame.ParseEuropeGame(game);
                     results.Add(g);
                 }
             }
@@ -61,7 +79,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            return results.OrderBy(game => NameStringCompare(normalizedSearchName, game.Name)).ToList();
+            return results.OrderByRelevance(normalizedSearchName);
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)
@@ -78,12 +96,21 @@ namespace NintendoMetadata.Client
                 OverrideEncoding = Encoding.UTF8
             };
             var doc = web.Load(link.Url);
-            var descriptionNode = doc.DocumentNode.SelectSingleNode(@"//section[@id='Overview']");
-            if (descriptionNode != null)
+            var fullDescription = "";
+            var descriptionNodes = doc.DocumentNode.SelectNodes(@"//section[@id='Overview']//div[contains(@class, 'row-content')]/div");
+            foreach (var descriptionNode in descriptionNodes)
             {
-                game.FullDescription = Regex.Replace(descriptionNode.InnerHtml, @"\s{2,}", "");
-                logger.Info(game.FullDescription);
+                var text = descriptionNode.InnerHtml.Trim();
+                text = Regex.Replace(text, @"\s{2,}", "");
+                text = Regex.Replace(text, @" class=""(.*?)""", "");
+                fullDescription += text;
             }
+            if (fullDescription.StartsWith(@"<p>"))
+            {
+                fullDescription = fullDescription.Substring(3, fullDescription.Length - 7);
+            }
+            game.FullDescription = fullDescription;
+            logger.Info(game.FullDescription);
 
             return game;
         }

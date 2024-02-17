@@ -12,13 +12,13 @@
     </UserControl.Resources>
     <StackPanel Margin="20">
         <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
-            <TextBlock Text="Nintendo Store Region" VerticalAlignment="Center"/>
+            <TextBlock Text="Default Nintendo Store Region" VerticalAlignment="Center"/>
             <ComboBox SelectedValue="{Binding Settings.StoreRegion}"
                       Margin="5,0,0,0">
                 <ComboBox.ItemsSource>
                     <x:Array Type="{x:Type sys:Enum}">
                         <nintendata:StoreRegion>USA</nintendata:StoreRegion>
-                        <nintendata:StoreRegion>UK</nintendata:StoreRegion>
+                        <nintendata:StoreRegion>Europe</nintendata:StoreRegion>
                         <nintendata:StoreRegion>Japan</nintendata:StoreRegion>
                         <nintendata:StoreRegion>Asia</nintendata:StoreRegion>
                     </x:Array>
@@ -30,5 +30,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </StackPanel>
+        <CheckBox Content="Prefer Playnite game region" Margin="0,15,0,0"
+                  IsChecked="{Binding Settings.IsPlayniteGameRegionPreferred}"/>
     </StackPanel>
 </UserControl>

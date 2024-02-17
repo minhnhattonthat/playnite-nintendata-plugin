@@ -1,16 +1,11 @@
 ﻿using Playnite.SDK.Plugins;
-using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json.Linq;
 using HtmlAgilityPack;
-using Playnite.SDK.Models;
-using System.Text.RegularExpressions;
-using System.Web.UI.WebControls;
+using Newtonsoft.Json;
 
 namespace NintendoMetadata.Client
 {
@@ -40,7 +35,14 @@ namespace NintendoMetadata.Client
             List<NintendoGame> results = new List<NintendoGame>();
 
             var request = new RestRequest("/", Method.Post);
-            var body = $@"{{""requests"": [{{""indexName"": ""store_game_en_us"",""query"": ""{normalizedSearchName}"",""params"": ""hitsPerPage=10""}}]}}";
+            var requestItem = new
+            {
+                indexName = "store_game_en_us",
+                query = normalizedSearchName,
+                facetFilters = new[] { "corePlatforms:Nintendo Switch", "hasDlc:false" },
+                hitsPerPage = 10,
+            };
+            var body = $@"{{""requests"": [{JsonConvert.SerializeObject(requestItem)}]}}";
             request.RequestFormat = DataFormat.Json;
             request.AddBody(body);
 
@@ -68,7 +70,7 @@ namespace NintendoMetadata.Client
                 logger.Error(e, "Error performing search");
             }
 
-            return results.OrderBy(game => NameStringCompare(normalizedSearchName, game.Name)).ToList();
+            return results.OrderByRelevance(normalizedSearchName);
         }
 
         public override NintendoGame GetGameDetails(NintendoGame game)
@@ -82,27 +84,11 @@ namespace NintendoMetadata.Client
 
             var web = new HtmlWeb();
             var doc = web.Load(link.Url);
-            var descriptionNode = doc.DocumentNode.SelectSingleNode(@"//div[@class='ProductDetailstyles__Grid-sc-4l5ex7-4 hKLOzA']//p");
-            if (descriptionNode != null)
-            {
-                game.FullDescription = descriptionNode.InnerHtml;
-                logger.Info(game.FullDescription);
-            }
-            else
-            {
-                var nextData = doc.DocumentNode.SelectSingleNode(@"//script[@id='__NEXT_DATA__']");
-                if (nextData != null)
-                {
-                    var matches = Regex.Matches(nextData.InnerText, @"""description"":""(.*?)""");
-                    if (matches.Count > 1 && matches[matches.Count - 1].Success)
-                    {
-                        string fullDescription = Regex.Unescape(matches[matches.Count - 1].Groups[1].Value);
-                        fullDescription = fullDescription.Substring(3, fullDescription.Length - 7);
-                        game.FullDescription = fullDescription;
-                    }
-                    //var json = JObject.Parse(nextData.InnerText);
-                }
-            }
+            var dataNode = doc.DocumentNode.SelectSingleNode(@"//script[@id='__NEXT_DATA__']");
+            var dataJson = JObject.Parse(dataNode.InnerText);
+            var sku = (string)dataJson.SelectToken($@"props.pageProps.analytics.product.sku");
+            var fullDescription = (string)dataJson.SelectToken($@"props.pageProps.initialApolloState.StoreProduct:{{""sku"":""{sku}"",""locale"":""en_US""}}.description");
+            game.FullDescription = fullDescription.Substring(3, fullDescription.Length - 7);
 
             return game;
         }

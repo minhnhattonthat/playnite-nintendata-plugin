@@ -61,7 +61,7 @@ namespace NintendoMetadata
 
             if (!string.IsNullOrEmpty(developer?.Trim()))
             {
-                if (developer.EndsWith(", LTD."))
+                if (developer.EndsWith(", LTD.") || developer.EndsWith(", Inc."))
                 {
                     result.Developers.Add(new MetadataNameProperty(developer));
                 }
@@ -105,14 +105,14 @@ namespace NintendoMetadata
             return result;
         }
 
-        public static NintendoGame ParseUkGame(JObject data)
+        public static NintendoGame ParseEuropeGame(JObject data)
         {
             var result = new NintendoGame
             {
                 Title = (string)data["title"],
                 FullDescription = (string)data["product_catalog_description_s"],
                 ReleaseDate = new ReleaseDate((DateTime)data["dates_released_dts"][0]),
-                NSUID = (string)data["nsuid_txt"][0],
+                NSUID = (string)data["nsuid_txt"]?[0],
             };
             
             var developer = (string)data["softwareDeveloper"];
@@ -131,11 +131,12 @@ namespace NintendoMetadata
 
             result.AgeRatings.Add(new MetadataNameProperty((string)data["pretty_agerating_s"]));
 
-            result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.co.uk/{(string)data["url"]}"));
+            result.Links.Add(new Link("My Nintendo Store", $"https://www.nintendo.co.uk{(string)data["url"]}"));
+
+            var imageUrl = (string)data["image_url_sq_s"] ?? ((string)data["image_url_tm_s"])?.Replace("300w", "500w") ?? (string)data["image_url"];
+            result.Image = new MetadataFile(imageUrl);
             
-            result.Image = new MetadataFile((string)data["image_url_sq_s"]);
-            
-            result.LandscapeImage = new MetadataFile(((string)data["image_url_h2x1_s"]).Replace("500w", "1600w"));
+            result.LandscapeImage = new MetadataFile(((string)data["image_url_h2x1_s"]).Replace("500w", "1600w") ?? (string)data["image_url"]);
 
             result.Name = result.Title;
             result.Description = $"{result.ReleaseDate?.Year}-{result.ReleaseDate?.Month}-{result.ReleaseDate?.Day} | {result.Publishers.First()}";
@@ -193,7 +194,7 @@ namespace NintendoMetadata
                 NSUID = (string)data["common"]["nsuid"],
             };
 
-            string developer = (string)data["common"]["developerName"];
+            string developer = (string)data.SelectToken("common.developerName");
             if (!string.IsNullOrEmpty(developer))
             {
                 result.Developers.Add(new MetadataNameProperty(developer));
@@ -214,14 +215,17 @@ namespace NintendoMetadata
                 result.Links.Add(new Link("My Nintendo Store", storeUrl));
             }
 
-            if (data["common"]["heroImageSquare"].HasValues)
+            var imageUrl = (string)data.SelectToken("common.heroImageSquare.url");
+            if (imageUrl != null)
             {
-                var imageUrl = (string)data["common"]["heroImageSquare"]["url"];
                 result.Image = new MetadataFile(imageUrl);
             }
 
-            var landscapeImageUrl = (string)data["common"]["heroImage169"]["url"];
-            result.LandscapeImage = new MetadataFile(landscapeImageUrl);
+            var landscapeImageUrl = (string)data.SelectToken("common.heroImage169.url");
+            if (landscapeImageUrl != null)
+            {
+                result.LandscapeImage = new MetadataFile(landscapeImageUrl);
+            }
 
             if (result.Image == null)
             {
