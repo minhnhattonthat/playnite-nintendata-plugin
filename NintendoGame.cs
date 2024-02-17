@@ -136,7 +136,7 @@ namespace NintendoMetadata
             var imageUrl = (string)data["image_url_sq_s"] ?? ((string)data["image_url_tm_s"])?.Replace("300w", "500w") ?? (string)data["image_url"];
             result.Image = new MetadataFile(imageUrl);
             
-            result.LandscapeImage = new MetadataFile(((string)data["image_url_h2x1_s"]).Replace("500w", "1600w"));
+            result.LandscapeImage = new MetadataFile(((string)data["image_url_h2x1_s"]).Replace("500w", "1600w") ?? (string)data["image_url"]);
 
             result.Name = result.Title;
             result.Description = $"{result.ReleaseDate?.Year}-{result.ReleaseDate?.Month}-{result.ReleaseDate?.Day} | {result.Publishers.First()}";

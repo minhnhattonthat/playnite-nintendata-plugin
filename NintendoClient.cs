@@ -123,13 +123,10 @@ namespace NintendoMetadata
             var platformName = options.GameData.Platforms?[0]?.Name;
             if (platformName != null)
             {
-                if (platformName == " Nintendo Switch")
+                var success = Enum.TryParse<NintendoPlatform>(platformName.Replace(" ", ""), out var parsedPlatform);
+                if (success)
                 {
-                    nintendoPlatform = NintendoPlatform.NintendoSwitch;
-                }
-                else if (platformName == "Nintendo 3DS")
-                {
-                    nintendoPlatform = NintendoPlatform.Nintendo3DS;
+                    nintendoPlatform = parsedPlatform;
                 }
             }
             return nintendoPlatform;

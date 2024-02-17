@@ -25,10 +25,22 @@ namespace NintendoMetadata.Client
         {
             List<NintendoGame> results = new List<NintendoGame>();
             var platform = options.GetPlatform();
-            var playableOnTxt = "HAC";
-            if (platform == NintendoPlatform.Nintendo3DS)
+            string playableOnTxt;
+            switch(platform)
             {
-                playableOnTxt = "CTR";
+                case NintendoPlatform.Nintendo3DS:
+                    playableOnTxt = "CTR";
+                    break;
+                case NintendoPlatform.NintendoWii:
+                    playableOnTxt = "RVL";
+                    break;
+                case NintendoPlatform.NintendoWiiU:
+                    playableOnTxt = "WUP";
+                    break;
+                case NintendoPlatform.NintendoSwitch:
+                default:
+                    playableOnTxt = "HAC";
+                    break;
             }
 
             var request = new RestRequest("/");
@@ -88,23 +100,10 @@ namespace NintendoMetadata.Client
             var descriptionNodes = doc.DocumentNode.SelectNodes(@"//section[@id='Overview']//div[contains(@class, 'row-content')]/div");
             foreach (var descriptionNode in descriptionNodes)
             {
-                var header = descriptionNode.SelectSingleNode(@".//h2");
-                if (header != null) 
-                {
-                    var text = new Regex(@" class=""(.*?)""").Replace(header.OuterHtml, "");
-                    fullDescription += text;
-                    continue; 
-                }
-                var paragraphs = descriptionNode.SelectNodes(@".//p");
-                if (paragraphs != null)
-                {
-                    foreach (var paragraph in paragraphs)
-                    {
-                        var text = Regex.Replace(paragraph.OuterHtml, @"\s{2,}", "");
-                        text = new Regex(@" class=""(.*?)""").Replace(text, "");
-                        fullDescription += text;
-                    }
-                }
+                var text = descriptionNode.InnerHtml.Trim();
+                text = Regex.Replace(text, @"\s{2,}", "");
+                text = Regex.Replace(text, @" class=""(.*?)""", "");
+                fullDescription += text;
             }
             if (fullDescription.StartsWith(@"<p>"))
             {

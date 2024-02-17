@@ -104,5 +104,9 @@ namespace NintendoMetadata
         NintendoSwitch,
         [Description("Nintendo 3DS")]
         Nintendo3DS,
+        [Description("Nintendo Wii")]
+        NintendoWii,
+        [Description("Nintendo Wii U")]
+        NintendoWiiU,
     }
 }
