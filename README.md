@@ -18,6 +18,5 @@ Playnite metadata extension for retrieving data from Nintendo stores. Currently 
 
 ## Credits
 
-For creating Playnite
+- [PlayNite](https://github.com/JosefNemec/Playnite) for creating Playnite.
 - [nintendo-switch-eshop](https://github.com/favna/nintendo-switch-eshop) provides findings on using Nintendo APIs.
-- [PlayNite](https://github.com/JosefNemec/Playnite)
